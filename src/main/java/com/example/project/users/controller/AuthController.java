@@ -18,6 +18,7 @@ import com.example.project.users.dto.RegisterRequest;
 import com.example.project.users.entity.User;
 import com.example.project.users.service.AuthenticationService;
 import com.example.project.users.service.OtpService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/account")
@@ -32,7 +33,7 @@ public class AuthController {
 	AuthenticationService authenticationService;
 	
 	@PostMapping("/register")
-	public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
+	public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
 		// return ResponseEntity.ok(authenticationService.signUp(registerRequest));
 
 		 try {

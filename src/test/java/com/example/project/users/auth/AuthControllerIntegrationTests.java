@@ -18,10 +18,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultHandler;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.junit.jupiter.api.Assertions.*;
+
+
+
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -50,7 +55,7 @@ public class AuthControllerIntegrationTests {
         registerRequest.setPassword("password");
 
         // Perform POST request
-        mockMvc.perform(MockMvcRequestBuilders.post("/all/register")
+        mockMvc.perform(MockMvcRequestBuilders.post("/account/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isOk())
@@ -75,7 +80,7 @@ public class AuthControllerIntegrationTests {
         registerRequest.setLastname("Doe");
         registerRequest.setEmail("johndoe@example.com");
         registerRequest.setPassword("password");
-        mockMvc.perform(MockMvcRequestBuilders.post("/all/register")
+        mockMvc.perform(MockMvcRequestBuilders.post("/account/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registerRequest)));
 
@@ -84,7 +89,7 @@ public class AuthControllerIntegrationTests {
         loginRequest.setPassword("password");
 
         // Perform POST request
-        mockMvc.perform(MockMvcRequestBuilders.post("/all/login")
+        mockMvc.perform(MockMvcRequestBuilders.post("/account/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
@@ -105,7 +110,7 @@ public class AuthControllerIntegrationTests {
         registerRequest.setPassword("password");
 
         // Perform POST request
-        mockMvc.perform(MockMvcRequestBuilders.post("/all/register")
+        mockMvc.perform(MockMvcRequestBuilders.post("/account/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isOk());
@@ -119,10 +124,44 @@ public class AuthControllerIntegrationTests {
         registerRequest.setPassword("password");
 
         // Perform POST request
-        mockMvc.perform(MockMvcRequestBuilders.post("/all/register")
+        mockMvc.perform(MockMvcRequestBuilders.post("/account/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isConflict()) ;// Expect conflict due to duplicate email
 
     }
+
+
+
+
+
+//     @Test
+//     @Transactional
+//     public void testRegisterNoData() throws Exception {
+ 
+
+
+//             ResultHandler printStatus = new ResultHandler() {
+//             @Override
+//             public void handle(MvcResult result) throws Exception {
+//                 int status = result.getResponse().getStatus();
+//                 System.out.println("Response Status: " + status);
+//             }
+//         };
+
+
+//         RegisterRequest registerRequest = new RegisterRequest();
+
+//         System.out.println("************");
+      
+//         mockMvc.perform(MockMvcRequestBuilders.post("/account/register")
+//                 .contentType(MediaType.APPLICATION_JSON)
+//                 .content(objectMapper.writeValueAsString(registerRequest)))
+//                 .andDo(printStatus)
+//                 .andExpect(status().isOk());
+    
+
+
+//     }
 }
+

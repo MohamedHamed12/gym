@@ -1,4 +1,4 @@
-package com.example.project.users.controller;
+package com.example.project.users.OTP;
 
 import com.example.project.users.controller.OtpController;
 import com.example.project.users.dto.OtpRequest;
@@ -71,7 +71,7 @@ public class OtpControllerTest {
         doNothing().when(otpService).generateAndSendOtp(registerRequest.getEmail());
 
         // Perform POST request
-        mockMvc.perform(post("/all/register")
+        mockMvc.perform(post("/account/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isOk());
@@ -94,7 +94,7 @@ public class OtpControllerTest {
         doNothing().when(otpService).generateAndSendOtp(registerRequest.getEmail());
 
         // Perform POST request
-        mockMvc.perform(post("/all/register")
+        mockMvc.perform(post("/account/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isOk());
@@ -109,7 +109,7 @@ public class OtpControllerTest {
         when(otpService.verifyOtp(otpRequest.getEmail(), otpRequest.getOtp())).thenReturn(true);
 
         // Perform POST request
-        mockMvc.perform(post("/all/otp/verify")
+        mockMvc.perform(post("/account/otp/verify")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(otpRequest)))
                 .andExpect(status().isOk());
