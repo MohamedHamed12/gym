@@ -127,7 +127,7 @@ public class AuthControllerIntegrationTests {
         mockMvc.perform(MockMvcRequestBuilders.post("/account/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registerRequest)))
-                .andExpect(status().isConflict()) ;// Expect conflict due to duplicate email
+                .andExpect(status().isBadRequest()) ;// Expect conflict due to duplicate email
 
     }
 

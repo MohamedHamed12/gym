@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 // @RestController
 @RequestMapping("/products")
@@ -28,6 +29,8 @@ public class ProductController {
         return product != null ? ResponseEntity.ok(product) : ResponseEntity.notFound().build();
     }
 
+
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     public Product saveProduct(@RequestBody Product product) {
         return productService.saveProduct(product);

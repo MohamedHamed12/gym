@@ -11,6 +11,7 @@ import com.example.project.users.dto.OtpRequest;
 import com.example.project.users.service.OtpService;
 
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/account/otp")
@@ -28,6 +29,8 @@ public class OtpController {
         otpService.generateAndSendOtp(email);
     }
 
+
+	// @PreAuthorize("permitAll()")
     @PostMapping("/verify")
     public  ResponseEntity<Map<String, Object>> verifyOtp(@Valid @RequestBody OtpRequest otpRequest) {
 

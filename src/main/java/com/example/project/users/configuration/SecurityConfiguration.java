@@ -51,17 +51,27 @@ public class SecurityConfiguration {
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.csrf(AbstractHttpConfigurer::disable)
-		.authorizeHttpRequests(request->request.requestMatchers("/account/**").permitAll()
-		.requestMatchers("/products/**").permitAll()
-				.requestMatchers("/otp/**").permitAll()
-								.requestMatchers("/api-docs/**").permitAll()
+		.authorizeHttpRequests(
+			authz -> authz
+			.anyRequest().permitAll()
+                // .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                // .requestMatchers("/public**").permitAll() // Allow access to any endpoint ending with "public"
+
+                // Your other security rules...
+                // .anyRequest().authenticated()
+            )
+			
+		// request->request.requestMatchers("/account/**").permitAll()
+		// .requestMatchers("/products/**").permitAll()
+				// .requestMatchers("/otp/**").permitAll()
+								// .requestMatchers("/api-docs/**").permitAll()
 								// .requestMatchers("/swagger-ui.html/**").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                // .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
 
 
-		.requestMatchers("/admin/**").hasAuthority(Role.Admin.name())
-		.requestMatchers("/user/**").hasAuthority(Role.User.name())
-		.anyRequest().authenticated())
+		// .requestMatchers("/admin/**").hasAuthority(Role.Admin.name())
+		// .requestMatchers("/user/**").hasAuthority(Role.User.name())
+		// .anyRequest().authenticated())
 		.sessionManagement(manager->manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 		.authenticationProvider(authenticationProvider())
 		.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

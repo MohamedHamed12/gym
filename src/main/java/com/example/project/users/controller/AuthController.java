@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/account")
@@ -48,6 +49,7 @@ public class AuthController {
     @ApiResponse(responseCode = "400", description = "Invalid input")
 
 
+	// @PreAuthorize("permitAll()")
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
 		// return ResponseEntity.ok(authenticationService.signUp(registerRequest));
@@ -64,12 +66,14 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
 	}
-	
+
+	// @PreAuthorize("permitAll()")
 	@PostMapping("/login")
 	public ResponseEntity<JwtAuthenticationRequest> login(@Valid @RequestBody LoginRequest loginRequest) throws IllegalAccessException{
 		return ResponseEntity.ok(authenticationService.login(loginRequest));
 	}
 	
+	// @PreAuthorize("permitAll()")
 	@PostMapping("/refresh")
 	public ResponseEntity<JwtAuthenticationRequest> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest){
 		return ResponseEntity.ok(authenticationService.refreshToken(refreshTokenRequest));
