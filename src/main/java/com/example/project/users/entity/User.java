@@ -40,6 +40,10 @@ public class User implements UserDetails {
     private String password;
     private Role role;
 
+
+	private Boolean emailConfirmed=  false; // Use Boolean to allow null values
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));

@@ -20,6 +20,11 @@ import com.example.project.users.service.AuthenticationService;
 import com.example.project.users.service.OtpService;
 import jakarta.validation.Valid;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 @RestController
 @RequestMapping("/account")
 // @CrossOrigin("http://localhost:4200")
@@ -32,6 +37,17 @@ public class AuthController {
 	@Autowired
 	AuthenticationService authenticationService;
 	
+
+
+
+
+
+    @Operation(summary = "Register a new user", description = "Creates a new user account")
+    @ApiResponse(responseCode = "200", description = "Successful registration",
+            content = @Content(schema = @Schema(implementation = String.class)))
+    @ApiResponse(responseCode = "400", description = "Invalid input")
+
+
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
 		// return ResponseEntity.ok(authenticationService.signUp(registerRequest));
@@ -50,7 +66,7 @@ public class AuthController {
 	}
 	
 	@PostMapping("/login")
-	public ResponseEntity<JwtAuthenticationRequest> login(@RequestBody LoginRequest loginRequest) throws IllegalAccessException{
+	public ResponseEntity<JwtAuthenticationRequest> login(@Valid @RequestBody LoginRequest loginRequest) throws IllegalAccessException{
 		return ResponseEntity.ok(authenticationService.login(loginRequest));
 	}
 	

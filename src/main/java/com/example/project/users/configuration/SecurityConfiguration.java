@@ -53,6 +53,12 @@ public class SecurityConfiguration {
 		http.csrf(AbstractHttpConfigurer::disable)
 		.authorizeHttpRequests(request->request.requestMatchers("/account/**").permitAll()
 		.requestMatchers("/products/**").permitAll()
+				.requestMatchers("/otp/**").permitAll()
+								.requestMatchers("/api-docs/**").permitAll()
+								// .requestMatchers("/swagger-ui.html/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+
+
 		.requestMatchers("/admin/**").hasAuthority(Role.Admin.name())
 		.requestMatchers("/user/**").hasAuthority(Role.User.name())
 		.anyRequest().authenticated())

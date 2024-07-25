@@ -6,6 +6,7 @@ import com.example.project.users.entity.User;
 import com.example.project.users.repository.UserRepository;
 import com.example.project.users.service.EmailSenderService;
 
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -29,15 +30,20 @@ public class OtpService {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
         String otp = generateOtp();
-        otpStorage.put(email, otp);
+        // otpStorage.put(email, otp);
+        otpStorage.put(otp, email);
+
         emailSenderService.sendOtpEmail(email, otp);
     }
 
-    public boolean verifyOtp(String email, String otp) {
-        String storedOtp = otpStorage.get(email);
-        if (storedOtp != null && storedOtp.equals(otp)) {
-            otpStorage.remove(email);
-            return true;
+    public boolean verifyOtp( String otp) {
+        String storedEmail = otpStorage.get(otp);
+      
+        if (storedEmail != null ) {
+            otpStorage.remove(otp);
+              
+            return  confirmEmail(storedEmail);
+            // return true;
         }
         return false;
     }
@@ -46,5 +52,20 @@ public class OtpService {
         Random random = new Random();
         int otp = 100000 + random.nextInt(900000); // Generate a 6-digit OTP
         return String.valueOf(otp);
+    }
+
+
+
+    private boolean confirmEmail(String email) {
+            // Fetch user by email
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.setEmailConfirmed(true);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
     }
 }

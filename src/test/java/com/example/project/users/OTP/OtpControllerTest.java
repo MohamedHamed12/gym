@@ -102,11 +102,11 @@ public class OtpControllerTest {
 
 
         OtpRequest otpRequest = new OtpRequest();
-        otpRequest.setEmail("johndoe@example.com");
+        // otpRequest.setEmail("johndoe@example.com");
         otpRequest.setOtp("123456");
 
         // Mock the behavior of OtpService to simulate OTP verification success
-        when(otpService.verifyOtp(otpRequest.getEmail(), otpRequest.getOtp())).thenReturn(true);
+        when(otpService.verifyOtp( otpRequest.getOtp())).thenReturn(true);
 
         // Perform POST request
         mockMvc.perform(post("/account/otp/verify")
