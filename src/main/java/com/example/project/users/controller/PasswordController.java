@@ -30,13 +30,13 @@ public class PasswordController {
 
     // Existing methods...
 
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(@Valid @RequestBody PasswordChangeRequest passwordChangeRequest) {
-        User user = authenticationService.getCurrentUser(); // Assuming you have a method to get the current user
-        authenticationService.changePassword(user, passwordChangeRequest);
-        return ResponseEntity.ok("Password changed successfully");
-    }
+    // @PreAuthorize("isAuthenticated()")
+    // @PostMapping("/change-password")
+    // public ResponseEntity<?> changePassword(@Valid @RequestBody PasswordChangeRequest passwordChangeRequest) {
+    //     User user = authenticationService.getCurrentUser(); // Assuming you have a method to get the current user
+    //     authenticationService.changePassword(user, passwordChangeRequest);
+    //     return ResponseEntity.ok("Password changed successfully");
+    // }
 
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody PasswordResetNewPassword passwordResetRequest) {
