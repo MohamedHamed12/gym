@@ -1,14 +1,20 @@
 package com.example.project.users.service;
 
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -54,9 +60,7 @@ public class JwtService {
 		return claimsResolver.apply(claims);
 	}
 	
-	public String extractUsername(String token) {
-		return extractClaim(token, Claims::getSubject);
-	}
+
 	
 	public boolean isTokenValid(String token, UserDetails userDetails) {
 		String username=extractUsername(token);
@@ -66,4 +70,18 @@ public class JwtService {
 	private boolean isTokenExpired(String token) {
 		return extractClaim(token, Claims::getExpiration).before(new Date());
 	}
+
+
+	 
+	 
+    
+	public String extractUsername(String token){
+		 
+            String decodedToken = new String(Base64.getDecoder().decode(token));
+            String[] parts = decodedToken.split("\\|");
+            
+            String email = parts[0];
+			return email;
+	}
+	
 }

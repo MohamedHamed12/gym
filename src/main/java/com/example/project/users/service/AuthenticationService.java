@@ -1,22 +1,35 @@
 package com.example.project.users.service;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties.Authentication;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.project.users.Exception.UserAlreadyExistsException;
 import com.example.project.users.dto.JwtAuthenticationRequest;
 import com.example.project.users.dto.LoginRequest;
+import com.example.project.users.dto.PasswordChangeRequest;
+
+import com.example.project.users.dto.PasswordResetNewPassword;
+import com.example.project.users.dto.PasswordResetOtp;
+import com.example.project.users.dto.PasswordResetRequest;
 import com.example.project.users.dto.RefreshTokenRequest;
 import com.example.project.users.dto.RegisterRequest;
+import com.example.project.users.entity.Otp;
+import com.example.project.users.entity.PasswordResetToken;
 // import com.example.project.users.entity.Order;
 import com.example.project.users.entity.User;
 // import com.example.project.users.enums.OrderStatus;
 import com.example.project.users.enums.Role;
+import com.example.project.users.repository.OtpRepository;
+import com.example.project.users.repository.PasswordResetTokenRepository;
 // import com.example.project.users.repository.OrderRepository;
 import com.example.project.users.repository.UserRepository;
 
@@ -27,7 +40,7 @@ public class AuthenticationService {
 	private UserRepository userRepository;
 	
 	@Autowired
-	private PasswordEncoder encoder;
+	private PasswordEncoder passwordEncoder;
 	
 	@Autowired
 	private AuthenticationManager authenticationManager;
@@ -35,9 +48,16 @@ public class AuthenticationService {
 	@Autowired
 	private JwtService jwtService;
 	
-	// @Autowired
-	// private OrderRepository orderRepository;  
-	
+
+	@Autowired
+    private OtpService otpService;
+
+	@Autowired 
+	private PasswordResetTokenRepository passwordResetTokenRepository; 
+
+	@Autowired
+    private OtpRepository otpRepository;
+
 	public User signUp(RegisterRequest signUpRequest) {
 		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             throw new UserAlreadyExistsException("User with email " + signUpRequest.getEmail() + " already exists.");
@@ -46,7 +66,7 @@ public class AuthenticationService {
 		user.setEmail(signUpRequest.getEmail());
 		user.setFirstname(signUpRequest.getFirstname());
 		user.setLastname(signUpRequest.getLastname());
-		user.setPassword(encoder.encode(signUpRequest.getPassword()));
+		user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 		user.setRole(Role.User);
 		userRepository.save(user);
 		
@@ -81,4 +101,77 @@ public class AuthenticationService {
 	        throw new IllegalArgumentException("Invalid or expired refresh token");
 	    }
 	}
+
+
+	public User getCurrentUser() {
+        org.springframework.security.core.Authentication  authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserName = authentication.getName();
+        return userRepository.findByEmail(currentUserName)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
+    public void changePassword(User user, PasswordChangeRequest passwordChangeRequest) {
+        if (!passwordEncoder.matches(passwordChangeRequest.getOldPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Old password is incorrect");
+        }
+        user.setPassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    // public void resetPassword(PasswordResetRequest passwordResetRequest) {
+    //     User user = userRepository.findByEmail(passwordResetRequest.getEmail())
+    //             .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    //     otpService.generateAndSendOtp(user.getEmail());
+    // }
+
+	public void resetPassword(PasswordResetNewPassword passwordresetnewpassword ) {
+		String temporaryToken =passwordresetnewpassword.getTemporaryToken();
+		
+
+		PasswordResetToken passwordReset =passwordResetTokenRepository.findByToken(temporaryToken)
+				.orElseThrow(() -> new IllegalArgumentException("Token not found"));
+		User user=passwordReset.getUser();
+		user.setPassword(passwordresetnewpassword.getNewPassword()); // Ensure you hash the password appropriately
+		userRepository.save(user);
+	}
+
+    public String confirmResetPassword(PasswordResetOtp passwordResetOtp) {
+	
+
+        if (!otpService.verifyOtp(passwordResetOtp.getOtp())) {
+            throw new IllegalArgumentException("Invalid OTP");
+        }
+		Otp otpEntity = otpRepository.findByOtp( passwordResetOtp.getOtp())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid OTP"));
+
+
+				
+				
+		String resetToken = UUID.randomUUID().toString();
+	
+		PasswordResetToken passwordResetToken = new PasswordResetToken();
+		passwordResetToken.setUser(otpEntity.getUser());
+		passwordResetToken.setToken(resetToken);
+		passwordResetTokenRepository.save(passwordResetToken);
+
+
+
+
+		otpRepository.delete(otpEntity);
+
+
+   		return resetToken;
+
+
+    }
+
+	public void passwordResetRequest(PasswordResetRequest passwordResetRequest) {
+    //    PasswordResetToken tokenEntity =PasswordResetTokenRepository.findByToken(passwordResetRequest.get);
+        User user = userRepository.findByEmail(passwordResetRequest.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+
+		otpService.generateAndSendOtp(passwordResetRequest.getEmail());
+	}
+	
 }
