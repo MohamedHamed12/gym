@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.project.users.dto.RefreshTokenRequest;
 import com.example.project.users.Exception.UserAlreadyExistsException;
+import com.example.project.users.dto.ErrorResponse;
 import com.example.project.users.dto.JwtAuthenticationRequest;
 import com.example.project.users.dto.LoginRequest;
 import com.example.project.users.dto.RegisterRequest;
@@ -71,9 +72,20 @@ public class AuthController {
 
 	// @PreAuthorize("permitAll()")
 	@PostMapping("/login")
-	public ResponseEntity<JwtAuthenticationRequest> login(@Valid @RequestBody LoginRequest loginRequest)
-			throws IllegalAccessException {
-		return ResponseEntity.ok(authenticationService.login(loginRequest));
+	public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest)
+			// throws IllegalAccessException
+	 {
+		try{
+
+			return ResponseEntity.ok(authenticationService.login(loginRequest));
+		}
+		 catch (Exception e) {
+			       ErrorResponse errorResponse = new ErrorResponse(" failed: " + e.getMessage());
+			        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+
+
+			
+		}
 	}
 
 	// @PreAuthorize("permitAll()")
