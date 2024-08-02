@@ -29,35 +29,44 @@ public class OtpController {
     }
 
     @PostMapping("/request")
-    public 	 ResponseEntity<?>  requestOtp(@Valid @RequestBody EmailRequest emailRequest) {
+    public ResponseEntity<?> requestOtp(@Valid @RequestBody EmailRequest emailRequest) {
         // otpService.generateAndSendOtp(emailRequest.getEmail());
         try {
             otpService.generateAndSendOtp(emailRequest.getEmail());
-            SuccessResponse response = new SuccessResponse("User registered successfully.otp sent  Please confirm your email.");
+            SuccessResponse response = new SuccessResponse(
+                    "User registered successfully.otp sent  Please confirm your email.");
 
             return ResponseEntity.ok(response);
-        }  catch (Exception ex) {
-            ErrorResponse errorResponse = new ErrorResponse("Internal  Error "+ex.getMessage());
+        } catch (Exception ex) {
+            ErrorResponse errorResponse = new ErrorResponse("Internal  Error " + ex.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 
     // @PreAuthorize("permitAll()")
     @PostMapping("/verify")
-    public ResponseEntity<Map<String, Object>> verifyOtp(@Valid @RequestBody OtpRequest otpRequest) {
+    public ResponseEntity<?> verifyOtp(@Valid @RequestBody OtpRequest otpRequest) {
+        try {
 
-        Map<String, Object> response = new HashMap<>();
+            if (otpService.verifyOtp(otpRequest.getOtp())) {
+                   SuccessResponse response = new SuccessResponse("OTP verified successfully");
 
-        if (otpService.verifyOtp(otpRequest.getOtp())) {
-            response.put("success", true);
-            response.put("message", "OTP verified successfully");
-            return ResponseEntity.ok(response);
-        } else {
-            response.put("success", false);
-            response.put("message", "Invalid OTP");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+              
+                return ResponseEntity.ok(response);
+            } else {
+            
+                ErrorResponse errorResponse = new ErrorResponse("cannot verify" );
+
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+            }
         }
-
         // return otpService.verifyOtp( otpRequest.getOtp());
+        catch (Exception e) {
+            // Handle other potential exceptions
+        
+            ErrorResponse errorResponse = new ErrorResponse("Internal  Error message" + e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
 }
