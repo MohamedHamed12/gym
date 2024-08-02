@@ -14,6 +14,7 @@ import com.example.project.users.Exception.UserAlreadyExistsException;
 import com.example.project.users.dto.JwtAuthenticationRequest;
 import com.example.project.users.dto.LoginRequest;
 import com.example.project.users.dto.RegisterRequest;
+import com.example.project.users.dto.SuccessResponse;
 import com.example.project.users.entity.User;
 import com.example.project.users.service.AuthenticationService;
 import com.example.project.users.service.OtpService;
@@ -54,7 +55,9 @@ public class AuthController {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal server error occurred. otp"+e.getMessage());
 
 			}
-			return ResponseEntity.ok(user);
+			SuccessResponse response = new SuccessResponse("User registered successfully.otp sent  Please confirm your email.");
+        	return ResponseEntity.ok(response);
+			// return ResponseEntity.ok(user);
 		} catch (UserAlreadyExistsException e) {
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
 		} catch (Exception e) {

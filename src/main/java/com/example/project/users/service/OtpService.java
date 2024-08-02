@@ -26,7 +26,6 @@
 
 //     private static final long OTP_VALID_DURATION = 5 * 60 * 1000; // 5 minutes
 
-   
 //       private String generateOtp() {
 //         Random random = new Random();
 //         int otp = 100000 + random.nextInt(900000);
@@ -36,10 +35,8 @@
 //             String otpCode = generateOtp();
 //             Otp otp = new Otp();
 
-
 //             User user = userRepository.findByEmail(email)
 //                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
 
 //             otp.setUser(user);
 //             otp.setOtp(otpCode);
@@ -51,7 +48,7 @@
 //             // Send the OTP to the user's email
 //             emailService.sendOtpEmail(email, otpCode);
 //         }
-    
+
 //     public boolean verifyOtp( String otp) {
 //         Otp otpEntity = otpRepository.findByOtp( otp)
 //                 .orElseThrow(() -> new IllegalArgumentException("Invalid OTP"));
@@ -61,7 +58,6 @@
 //             otpRepository.delete(otpEntity);
 //             throw new IllegalArgumentException("OTP has expired");
 //         }
-
 
 //         return true;
 //     }
@@ -106,32 +102,47 @@ public class OtpService {
 
     public void generateAndSendOtp(String email) {
         try {
+
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> {
+                        logger.error("User not found for email: {}", email);
+                        return new IllegalArgumentException("User not found");
+                    });
+
+            Optional<Otp> otpOptional = otpRepository.findByUserId(user.getId());
+            otpOptional.ifPresent(otpRepository::delete);
+
             logger.info("Generating OTP for email: {}", email);
 
             String otpCode = generateOtp();
             Otp otp = new Otp();
 
-            User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> {
-                    logger.error("User not found for email: {}", email);
-                    return new IllegalArgumentException("User not found");
-                });
-
             otp.setUser(user);
             otp.setOtp(otpCode);
             otp.setExpirationTime(Instant.now().plus(15, ChronoUnit.MINUTES).toEpochMilli());
 
-            
-            user.setOtp(otp);
+            // otpRepository.save(otp);
+
+            user.setOtp(otp); // Set the Otp in the User entity
+
             otpRepository.save(otp);
-            userRepository.save(user);
+            userRepository.save(user); // Save the user to update the
+
+            // user = userRepository.findByEmail(email)
+            // .orElseThrow(() -> {
+            // logger.error("User not found for email: {}", email);
+            // return new IllegalArgumentException("User not found");
+            // });
+            // System.out.println("***************user*********************************");
+            // System.out.println(user);
+            // user.set
+            // userRepository.save(user);
 
             logger.info("Generated OTP {} for user {}", otpCode, email);
-            try{
+            try {
 
                 emailService.sendOtpEmail(email, otpCode);
-            }
-            catch  (Exception e){
+            } catch (Exception e) {
                 throw new RuntimeException(" emailService.sendOtpEmail", e);
 
             }
@@ -151,17 +162,17 @@ public class OtpService {
             logger.info("Verifying OTP: {}", otpCode);
 
             Otp otpEntity = otpRepository.findByOtp(otpCode)
-                .orElseThrow(() -> {
-                    logger.error("Invalid OTP: {}", otpCode);
-                    return new IllegalArgumentException("Invalid OTP");
-                });
+                    .orElseThrow(() -> {
+                        logger.error("Invalid OTP: {}", otpCode);
+                        return new IllegalArgumentException("Invalid OTP");
+                    });
 
             if (Instant.now().toEpochMilli() > otpEntity.getExpirationTime()) {
                 otpRepository.delete(otpEntity);
                 logger.warn("OTP has expired: {}", otpCode);
                 throw new IllegalArgumentException("OTP has expired");
             }
-            User user=otpEntity.getUser();
+            User user = otpEntity.getUser();
             user.setEmailConfirmed(true);
             userRepository.save(user);
 
