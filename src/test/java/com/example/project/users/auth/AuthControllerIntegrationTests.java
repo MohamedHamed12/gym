@@ -98,8 +98,8 @@ public class AuthControllerIntegrationTests {
         mockMvc.perform(MockMvcRequestBuilders.post("/account/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isOk());
-                // .andExpect(jsonPath("$.token").exists());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").exists());
     }
 
     
