@@ -44,63 +44,63 @@ public class AuthControllerIntegrationTests {
     @Autowired
     private UserRepository userRepository;
 
-//     @Test
-//     @DirtiesContext
-//     public void testRegister() throws Exception {
+    @Test
+    @DirtiesContext
+    public void testRegister() throws Exception {
         // Create test data
-//         RegisterRequest registerRequest = new RegisterRequest();
-//         registerRequest.setFirstname("John");
-//         registerRequest.setLastname("Doe");
-//         registerRequest.setEmail("johndoe1@example.com");
-//         registerRequest.setPassword("password");
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setFirstname("John");
+        registerRequest.setLastname("Doe");
+        registerRequest.setEmail("johndoe1@example.com");
+        registerRequest.setPassword("password");
 
-//         // Perform POST request
-//         mockMvc.perform(MockMvcRequestBuilders.post("/account/register")
-//                 .contentType(MediaType.APPLICATION_JSON)
-//                 .content(objectMapper.writeValueAsString(registerRequest)))
-//                 .andExpect(status().isOk())
-//                 .andExpect(jsonPath("$.firstname").value("John"))
-//                 .andExpect(jsonPath("$.lastname").value("Doe"))
-//                 .andExpect(jsonPath("$.email").value("johndoe1@example.com"));
+        // Perform POST request
+        mockMvc.perform(MockMvcRequestBuilders.post("/account/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstname").value("John"))
+                .andExpect(jsonPath("$.lastname").value("Doe"))
+                .andExpect(jsonPath("$.email").value("johndoe1@example.com"));
 
-//         // Verify the user is saved in repository
-//         User user = userRepository.findByEmail("johndoe1@example.com").orElse(null);
-//         assertNotNull(user);
-//         assertEquals("John", user.getFirstname());
-//         assertEquals("Doe", user.getLastname());
-//         assertEquals("johndoe1@example.com", user.getEmail());
-//     }
+        // Verify the user is saved in repository
+        User user = userRepository.findByEmail("johndoe1@example.com").orElse(null);
+        assertNotNull(user);
+        assertEquals("John", user.getFirstname());
+        assertEquals("Doe", user.getLastname());
+        assertEquals("johndoe1@example.com", user.getEmail());
+    }
 
-//     @Test
-//     @DirtiesContext
-//     public void testLogin() throws Exception {
-//         // Insert test data
-//         RegisterRequest registerRequest = new RegisterRequest();
-//         registerRequest.setFirstname("John");
-//         registerRequest.setLastname("Doe");
-//         registerRequest.setEmail("johndoe@example.com");
-//         registerRequest.setPassword("password");
-//         mockMvc.perform(MockMvcRequestBuilders.post("/account/register")
-//                 .contentType(MediaType.APPLICATION_JSON)
-//                 .content(objectMapper.writeValueAsString(registerRequest)));
+    @Test
+    @DirtiesContext
+    public void testLogin() throws Exception {
+        // Insert test data
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setFirstname("John");
+        registerRequest.setLastname("Doe");
+        registerRequest.setEmail("johndoe@example.com");
+        registerRequest.setPassword("password");
+        mockMvc.perform(MockMvcRequestBuilders.post("/account/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest)));
 
-//         User user =userRepository.findByEmail("johndoe@example.com").            
-//                 orElseThrow(() -> new IllegalArgumentException("Invalid Email"));
-//         user.setEmailConfirmed(true);
-//         userRepository.save(user);
+        User user =userRepository.findByEmail("johndoe@example.com").            
+                orElseThrow(() -> new IllegalArgumentException("Invalid Email"));
+        user.setEmailConfirmed(true);
+        userRepository.save(user);
 
         
-//         LoginRequest loginRequest = new LoginRequest();
-//         loginRequest.setEmail("johndoe@example.com");
-//         loginRequest.setPassword("password");
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail("johndoe@example.com");
+        loginRequest.setPassword("password");
         
-//         // Perform POST request
-//         mockMvc.perform(MockMvcRequestBuilders.post("/account/login")
-//                 .contentType(MediaType.APPLICATION_JSON)
-//                 .content(objectMapper.writeValueAsString(loginRequest)))
-//                 .andExpect(status().isOk())
-//                 .andExpect(jsonPath("$.token").exists());
-//     }
+        // Perform POST request
+        mockMvc.perform(MockMvcRequestBuilders.post("/account/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").exists());
+    }
 
     
    
@@ -141,33 +141,33 @@ public class AuthControllerIntegrationTests {
 
 
 
-//     @Test
-//     @Transactional
-//     public void testRegisterNoData() throws Exception {
+    @Test
+    @Transactional
+    public void testRegisterNoData() throws Exception {
  
 
 
-//             ResultHandler printStatus = new ResultHandler() {
-//             @Override
-//             public void handle(MvcResult result) throws Exception {
-//                 int status = result.getResponse().getStatus();
-//                 System.out.println("Response Status: " + status);
-//             }
-//         };
+            ResultHandler printStatus = new ResultHandler() {
+            @Override
+            public void handle(MvcResult result) throws Exception {
+                int status = result.getResponse().getStatus();
+                System.out.println("Response Status: " + status);
+            }
+        };
 
 
-//         RegisterRequest registerRequest = new RegisterRequest();
+        RegisterRequest registerRequest = new RegisterRequest();
 
-//         System.out.println("************");
+        System.out.println("************");
       
-//         mockMvc.perform(MockMvcRequestBuilders.post("/account/register")
-//                 .contentType(MediaType.APPLICATION_JSON)
-//                 .content(objectMapper.writeValueAsString(registerRequest)))
-//                 .andDo(printStatus)
-//                 .andExpect(status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.post("/account/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest)))
+                .andDo(printStatus)
+                .andExpect(status().isOk());
     
 
 
-//     }
+    }
 }
 
