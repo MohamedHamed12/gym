@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import com.example.project.users.dto.RefreshTokenRequest;
 import com.example.project.users.Exception.UserAlreadyExistsException;
 import com.example.project.users.dto.JwtAuthenticationRequest;
@@ -34,48 +33,49 @@ public class AuthController {
 	@Autowired
 	OtpService otpService;
 
-
 	@Autowired
 	AuthenticationService authenticationService;
-	
 
-
-
-
-
-    @Operation(summary = "Register a new user", description = "Creates a new user account")
-    @ApiResponse(responseCode = "200", description = "Successful registration",
-            content = @Content(schema = @Schema(implementation = String.class)))
-    @ApiResponse(responseCode = "400", description = "Invalid input")
-
+	@Operation(summary = "Register a new user", description = "Creates a new user account")
+	@ApiResponse(responseCode = "200", description = "Successful registration", content = @Content(schema = @Schema(implementation = String.class)))
+	@ApiResponse(responseCode = "400", description = "Invalid input")
 
 	// @PreAuthorize("permitAll()")
+
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
-		// return ResponseEntity.ok(authenticationService.signUp(registerRequest));
+		try {
+			User user = authenticationService.signUp(registerRequest);
+			try{
 
-		 try {
-            User user = authenticationService.signUp(registerRequest);
+				otpService.generateAndSendOtp(registerRequest.getEmail());
+			}
+			catch(Exception e){
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal server error occurred. otp"+e.getMessage());
 
-
-			otpService.generateAndSendOtp(registerRequest.getEmail());
-
-
-            return ResponseEntity.ok(user);
-        } catch (UserAlreadyExistsException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
+			}
+			return ResponseEntity.ok(user);
+		} catch (UserAlreadyExistsException e) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+		} catch (Exception e) {
+			// Log the exception
+			System.err.println("An error occurred during registration: " + e.getMessage());
+			e.printStackTrace();
+			// Return a generic error response
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal server error occurred. "+e.getMessage());
+		}
 	}
 
 	// @PreAuthorize("permitAll()")
 	@PostMapping("/login")
-	public ResponseEntity<JwtAuthenticationRequest> login(@Valid @RequestBody LoginRequest loginRequest) throws IllegalAccessException{
+	public ResponseEntity<JwtAuthenticationRequest> login(@Valid @RequestBody LoginRequest loginRequest)
+			throws IllegalAccessException {
 		return ResponseEntity.ok(authenticationService.login(loginRequest));
 	}
-	
+
 	// @PreAuthorize("permitAll()")
 	@PostMapping("/refresh")
-	public ResponseEntity<JwtAuthenticationRequest> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest){
+	public ResponseEntity<JwtAuthenticationRequest> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest) {
 		return ResponseEntity.ok(authenticationService.refreshToken(refreshTokenRequest));
 	}
 }

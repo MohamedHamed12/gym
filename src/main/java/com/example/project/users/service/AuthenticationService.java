@@ -1,6 +1,7 @@
 package com.example.project.users.service;
 
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,140 +39,172 @@ public class AuthenticationService {
 
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-	
+
 	@Autowired
 	private AuthenticationManager authenticationManager;
-	
+
 	@Autowired
 	private JwtService jwtService;
-	
 
 	@Autowired
-    private OtpService otpService;
-
-	@Autowired 
-	private PasswordResetTokenRepository passwordResetTokenRepository; 
+	private OtpService otpService;
 
 	@Autowired
-    private OtpRepository otpRepository;
+	private PasswordResetTokenRepository passwordResetTokenRepository;
+
+	@Autowired
+	private OtpRepository otpRepository;
 
 	public User signUp(RegisterRequest signUpRequest) {
-		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            throw new UserAlreadyExistsException("User with email " + signUpRequest.getEmail() + " already exists.");
-        }
-		User user=new User();
+				// System.out.println("***********************************************");
+
+		Optional<User> existingUserOptional = userRepository.findByEmail(signUpRequest.getEmail());
+
+		if (existingUserOptional.isPresent()) {
+			User existingUser = existingUserOptional.get();
+			// Optional<Otp> otpOptional = otpRepository.findByUserId(existingUser.getId());
+				// System.out.println("****************otp found************************************");
+			// System.out.println(existingUser);
+			// if (existingUserOptional.isPresent()) {
+			// }
+			// otpOptional.ifPresent(otpRepository::delete);
+
+			if (!existingUser.getEmailConfirmed()) {
+			// // Delete the user with unconfirmed email
+			userRepository.delete(existingUser);
+			// Otp otp=otpRepository.findByu
+
+			userRepository.flush();
+
+			// System.out.println("****************deleted***********************");
+			}
+		} 
+		// else {
+			// throw new UserAlreadyExistsException("User with email " + signUpRequest.getEmail() + " already exists.");
+		// }
+
+		// existingUserOptional = userRepository.findByEmail(signUpRequest.getEmail());
+		// if (existingUserOptional.isPresent()) {
+		// 	System.out.println("****************not deleted why***********************");
+
+		// 	throw new RuntimeException("Failed to delete unconfirmed user.");
+		// }
+		// System.out.println("***********************************************");
+
+		// if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+		// throw new UserAlreadyExistsException("User with email " +
+		// signUpRequest.getEmail() + " already exists.");
+		// }
+		User user = new User();
 		user.setEmail(signUpRequest.getEmail());
 		user.setFirstname(signUpRequest.getFirstname());
 		user.setLastname(signUpRequest.getLastname());
 		user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 		user.setRole(Role.User);
 		userRepository.save(user);
-		
-	
-		
+
 		return user;
 	}
-	
+
 	public JwtAuthenticationRequest login(LoginRequest loginRequest) {
-		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-		var user=userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(()->new IllegalArgumentException("Invalid Email or Password"));
-		var jwt=jwtService.generateToken(user);
-		var refreshToken=jwtService.generateRefreshToken(new HashMap<>(),user);
-		JwtAuthenticationRequest jwtAuthResponse=new JwtAuthenticationRequest();
+		authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+
+		User user = userRepository.findByEmail(loginRequest.getEmail())
+				.orElseThrow(() -> new IllegalArgumentException("Invalid Email or Password"));
+
+		// Check if the email is confirmed
+		if (!user.getEmailConfirmed()) {
+			throw new IllegalArgumentException("Email not confirmed. Please confirm your email to log in.");
+		}
+
+		var jwt = jwtService.generateToken(user);
+		var refreshToken = jwtService.generateRefreshToken(new HashMap<>(), user);
+		JwtAuthenticationRequest jwtAuthResponse = new JwtAuthenticationRequest();
 		jwtAuthResponse.setToken(jwt);
 		jwtAuthResponse.setRefreshToken(refreshToken);
 		jwtAuthResponse.setUser(user);
 		return jwtAuthResponse;
 	}
-	
+
 	public JwtAuthenticationRequest refreshToken(RefreshTokenRequest refreshTokenRequest) {
-		String userEmail=jwtService.extractUsername(refreshTokenRequest.getToken());
-		User user=userRepository.findByEmail(userEmail).orElseThrow();
-		if(jwtService.isTokenValid(refreshTokenRequest.getToken(), user)) {
-			var jwt=jwtService.generateToken(user);
-			JwtAuthenticationRequest jwtAuthResponse=new JwtAuthenticationRequest();
+		String userEmail = jwtService.extractUsername(refreshTokenRequest.getToken());
+		User user = userRepository.findByEmail(userEmail).orElseThrow();
+		if (jwtService.isTokenValid(refreshTokenRequest.getToken(), user)) {
+			var jwt = jwtService.generateToken(user);
+			JwtAuthenticationRequest jwtAuthResponse = new JwtAuthenticationRequest();
 			jwtAuthResponse.setToken(jwt);
 			jwtAuthResponse.setRefreshToken(refreshTokenRequest.getToken());
 			jwtAuthResponse.setUser(user);
 			return jwtAuthResponse;
-		}else {
-	        throw new IllegalArgumentException("Invalid or expired refresh token");
-	    }
+		} else {
+			throw new IllegalArgumentException("Invalid or expired refresh token");
+		}
 	}
 
-
 	public User getCurrentUser() {
-        org.springframework.security.core.Authentication  authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserName = authentication.getName();
-        return userRepository.findByEmail(currentUserName)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-    }
+		org.springframework.security.core.Authentication authentication = SecurityContextHolder.getContext()
+				.getAuthentication();
+		String currentUserName = authentication.getName();
+		return userRepository.findByEmail(currentUserName)
+				.orElseThrow(() -> new IllegalArgumentException("User not found"));
+	}
 
-    public void changePassword(User user, PasswordChangeRequest passwordChangeRequest) {
-        if (!passwordEncoder.matches(passwordChangeRequest.getOldPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Old password is incorrect");
-        }
-        user.setPassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
-        userRepository.save(user);
-    }
+	public void changePassword(User user, PasswordChangeRequest passwordChangeRequest) {
+		if (!passwordEncoder.matches(passwordChangeRequest.getOldPassword(), user.getPassword())) {
+			throw new IllegalArgumentException("Old password is incorrect");
+		}
+		user.setPassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
+		userRepository.save(user);
+	}
 
-    // public void resetPassword(PasswordResetRequest passwordResetRequest) {
-    //     User user = userRepository.findByEmail(passwordResetRequest.getEmail())
-    //             .orElseThrow(() -> new IllegalArgumentException("User not found"));
-    //     otpService.generateAndSendOtp(user.getEmail());
-    // }
+	// public void resetPassword(PasswordResetRequest passwordResetRequest) {
+	// User user = userRepository.findByEmail(passwordResetRequest.getEmail())
+	// .orElseThrow(() -> new IllegalArgumentException("User not found"));
+	// otpService.generateAndSendOtp(user.getEmail());
+	// }
 
-	public void resetPassword(PasswordResetNewPassword passwordresetnewpassword ) {
-		String temporaryToken =passwordresetnewpassword.getTemporaryToken();
-		
+	public void resetPassword(PasswordResetNewPassword passwordresetnewpassword) {
+		String temporaryToken = passwordresetnewpassword.getTemporaryToken();
 
-		PasswordResetToken passwordReset =passwordResetTokenRepository.findByToken(temporaryToken)
+		PasswordResetToken passwordReset = passwordResetTokenRepository.findByToken(temporaryToken)
 				.orElseThrow(() -> new IllegalArgumentException("Token not found"));
-		User user=passwordReset.getUser();
+		User user = passwordReset.getUser();
 		user.setPassword(passwordresetnewpassword.getNewPassword()); // Ensure you hash the password appropriately
 		userRepository.save(user);
 	}
 
-    public String confirmResetPassword(PasswordResetOtp passwordResetOtp) {
-	
+	public String confirmResetPassword(PasswordResetOtp passwordResetOtp) {
 
-        if (!otpService.verifyOtp(passwordResetOtp.getOtp())) {
-            throw new IllegalArgumentException("Invalid OTP");
-        }
-		Otp otpEntity = otpRepository.findByOtp( passwordResetOtp.getOtp())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid OTP"));
+		if (!otpService.verifyOtp(passwordResetOtp.getOtp())) {
+			throw new IllegalArgumentException("Invalid OTP");
+		}
+		Otp otpEntity = otpRepository.findByOtp(passwordResetOtp.getOtp())
+				.orElseThrow(() -> new IllegalArgumentException("Invalid OTP"));
 
-
-				
-				
 		String resetToken = UUID.randomUUID().toString();
-	
+
 		PasswordResetToken passwordResetToken = new PasswordResetToken();
 		passwordResetToken.setUser(otpEntity.getUser());
 		passwordResetToken.setToken(resetToken);
 		passwordResetTokenRepository.save(passwordResetToken);
 
-
-
-
 		otpRepository.delete(otpEntity);
 
+		return resetToken;
 
-   		return resetToken;
-
-
-    }
+	}
 
 	public void passwordResetRequest(PasswordResetRequest passwordResetRequest) {
-    //    PasswordResetToken tokenEntity =PasswordResetTokenRepository.findByToken(passwordResetRequest.get);
-        User user = userRepository.findByEmail(passwordResetRequest.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
+		// PasswordResetToken tokenEntity
+		// =PasswordResetTokenRepository.findByToken(passwordResetRequest.get);
+		User user = userRepository.findByEmail(passwordResetRequest.getEmail())
+				.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
 		otpService.generateAndSendOtp(passwordResetRequest.getEmail());
 	}
-	
+
 }

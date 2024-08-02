@@ -38,7 +38,8 @@ public @interface UniqueEmail {
             if (email == null || email.isEmpty()) {
                 return true; // Or false depending on how you want to handle null or empty
             }
-            return !userRepository.existsByEmail(email); // Adjust based on your actual repository method
+            // return !userRepository.existsByEmail(email); // Adjust based on your actual repository method
+              return !userRepository.existsByEmailAndEmailConfirmed(email, true);
         }
     }
 }

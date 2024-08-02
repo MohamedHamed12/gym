@@ -9,12 +9,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.example.project.users.enums.Role;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+
+import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -43,6 +39,10 @@ public class User implements UserDetails {
 
 	private Boolean emailConfirmed=  false; // Use Boolean to allow null values
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+
+	// @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private Otp otp;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

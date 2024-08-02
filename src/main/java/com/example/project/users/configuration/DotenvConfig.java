@@ -1,14 +1,14 @@
-package com.example.project.users.configuration;
+// package com.example.project.users.configuration;
 
-import io.github.cdimascio.dotenv.Dotenv;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+// import io.github.cdimascio.dotenv.Dotenv;
+// import org.springframework.context.annotation.Bean;
+// import org.springframework.context.annotation.Configuration;
 
-@Configuration
-public class DotenvConfig {
+// @Configuration
+// public class DotenvConfig {
 
-    @Bean
-    public Dotenv dotenv() {
-        return Dotenv.configure().load();
-    }
-}
+//     @Bean
+//     public Dotenv dotenv() {
+//         return Dotenv.configure().load();
+//     }
+// }
