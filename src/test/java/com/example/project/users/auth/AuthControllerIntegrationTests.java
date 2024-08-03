@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 
 
@@ -100,6 +101,33 @@ public class AuthControllerIntegrationTests {
                 .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").exists());
+    }
+
+
+    @Test
+    @DirtiesContext
+    public void testLoginNotConfirmed() throws Exception {
+        // Insert test data
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setFirstname("John");
+        registerRequest.setLastname("Doe");
+        registerRequest.setEmail("johndoe@example.com");
+        registerRequest.setPassword("password");
+        mockMvc.perform(MockMvcRequestBuilders.post("/account/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(registerRequest)));
+
+        
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail("johndoe@example.com");
+        loginRequest.setPassword("password");
+        
+        // Perform POST request
+        mockMvc.perform(MockMvcRequestBuilders.post("/account/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andDo(print()) 
+                .andExpect(status().isForbidden());
     }
 
     

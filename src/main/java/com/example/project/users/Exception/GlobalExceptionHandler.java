@@ -12,6 +12,15 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import java.util.HashMap;
 import java.util.Map;
 
+
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.example.project.users.dto.ErrorResponse;
+import com.example.project.users.dto.GeneralResponse;
+
+import org.springframework.http.ResponseEntity;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -24,5 +33,13 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<?> handleResponseStatusException(ResponseStatusException ex) {
+        System.out.println("*******************exexex***********************"+ex.getStatusCode()+ex.getBody());
+        return ResponseEntity.status(ex.getStatusCode())
+                             .body(new GeneralResponse(ex.getReason()));
     }
 }

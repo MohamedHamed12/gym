@@ -42,6 +42,21 @@ public class UserService {
         }
     }
 
+
+
+
+	//    @Transactional
+    // public void deleteUser(Long userId) {
+    //     Optional<User> userOptional = userRepository.findById(userId);
+    //     if (userOptional.isPresent()) {
+    //         userRepository.delete(userOptional.get());
+    //     } else {
+    //         ErrorResponse errorResponse =new ErrorResponse("User not found");
+    //         return errorResponse;
+    //     }
+    // }
+
+
     @Transactional
     public void deleteAllUsers() {
         userRepository.deleteAll();

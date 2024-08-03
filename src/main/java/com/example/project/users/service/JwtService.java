@@ -75,13 +75,18 @@ public class JwtService {
 	 
 	 
     
-	public String extractUsername(String token){
+	// public String extractUsername(String token){
 		 
-            String decodedToken = new String(Base64.getDecoder().decode(token));
-            String[] parts = decodedToken.split("\\|");
+    //         String decodedToken = new String(Base64.getDecoder().decode(token));
+    //         String[] parts = decodedToken.split("\\|");
             
-            String email = parts[0];
-			return email;
-	}
+    //         String email = parts[0];
+	// 		return email;
+	// }
+
+	public String extractUsername(String token) {
+    return extractClaim(token, Claims::getSubject);
+}
+
 	
 }

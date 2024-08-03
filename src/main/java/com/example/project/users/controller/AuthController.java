@@ -48,49 +48,42 @@ public class AuthController {
 	public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
 		try {
 			User user = authenticationService.signUp(registerRequest);
-			try{
 
-				otpService.generateAndSendOtp(registerRequest.getEmail());
-			}
-			catch(Exception e){
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal server error occurred. otp"+e.getMessage());
+			otpService.generateAndSendOtp(registerRequest.getEmail());
 
-			}
-			SuccessResponse response = new SuccessResponse("User registered successfully.otp sent  Please confirm your email.");
-        	return ResponseEntity.ok(response);
-			// return ResponseEntity.ok(user);
-		} catch (UserAlreadyExistsException e) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+		
+			return ResponseEntity.ok(new SuccessResponse("User registered successfully.otp sent  Please confirm your email."));
 		} catch (Exception e) {
-			// Log the exception
-			System.err.println("An error occurred during registration: " + e.getMessage());
-			e.printStackTrace();
-			// Return a generic error response
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal server error occurred. "+e.getMessage());
+			
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("An internal server error occurred. " + e.getMessage()));
 		}
 	}
 
 	// @PreAuthorize("permitAll()")
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest)
-			// throws IllegalAccessException
-	 {
-		try{
+	// throws IllegalAccessException
+	{
+		// try {
 
 			return ResponseEntity.ok(authenticationService.login(loginRequest));
-		}
-		 catch (Exception e) {
-			       ErrorResponse errorResponse = new ErrorResponse(" failed: " + e.getMessage());
-			        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+		// } catch (Exception e) {
+		// 	ErrorResponse errorResponse = new ErrorResponse("An internal server error occurred." + e.getMessage());
+		// 	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 
-
-			
-		}
+		// }
 	}
 
 	// @PreAuthorize("permitAll()")
 	@PostMapping("/refresh")
-	public ResponseEntity<JwtAuthenticationRequest> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest) {
-		return ResponseEntity.ok(authenticationService.refreshToken(refreshTokenRequest));
+	public ResponseEntity<?> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+		try{
+
+			return ResponseEntity.ok(authenticationService.refreshToken(refreshTokenRequest));
+		} catch (Exception e) {
+			ErrorResponse errorResponse = new ErrorResponse("An internal server error occurred." + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+
+		}
 	}
 }

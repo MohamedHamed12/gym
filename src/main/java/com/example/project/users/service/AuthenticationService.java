@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties.Authentication;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +34,7 @@ import com.example.project.users.repository.OtpRepository;
 import com.example.project.users.repository.PasswordResetTokenRepository;
 // import com.example.project.users.repository.OrderRepository;
 import com.example.project.users.repository.UserRepository;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class AuthenticationService {
@@ -59,45 +61,22 @@ public class AuthenticationService {
 	private OtpRepository otpRepository;
 
 	public User signUp(RegisterRequest signUpRequest) {
-				// System.out.println("***********************************************");
+		// System.out.println("***********************************************");
 
 		Optional<User> existingUserOptional = userRepository.findByEmail(signUpRequest.getEmail());
 
 		if (existingUserOptional.isPresent()) {
 			User existingUser = existingUserOptional.get();
-			// Optional<Otp> otpOptional = otpRepository.findByUserId(existingUser.getId());
-				// System.out.println("****************otp found************************************");
-			// System.out.println(existingUser);
-			// if (existingUserOptional.isPresent()) {
-			// }
-			// otpOptional.ifPresent(otpRepository::delete);
 
 			if (!existingUser.getEmailConfirmed()) {
-			// // Delete the user with unconfirmed email
-			userRepository.delete(existingUser);
-			// Otp otp=otpRepository.findByu
+				// // Delete the user with unconfirmed email
+				userRepository.delete(existingUser);
 
-			userRepository.flush();
+				userRepository.flush();
 
-			// System.out.println("****************deleted***********************");
 			}
-		} 
-		// else {
-			// throw new UserAlreadyExistsException("User with email " + signUpRequest.getEmail() + " already exists.");
-		// }
+		}
 
-		// existingUserOptional = userRepository.findByEmail(signUpRequest.getEmail());
-		// if (existingUserOptional.isPresent()) {
-		// 	System.out.println("****************not deleted why***********************");
-
-		// 	throw new RuntimeException("Failed to delete unconfirmed user.");
-		// }
-		// System.out.println("***********************************************");
-
-		// if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-		// throw new UserAlreadyExistsException("User with email " +
-		// signUpRequest.getEmail() + " already exists.");
-		// }
 		User user = new User();
 		user.setEmail(signUpRequest.getEmail());
 		user.setFirstname(signUpRequest.getFirstname());
@@ -110,15 +89,23 @@ public class AuthenticationService {
 	}
 
 	public JwtAuthenticationRequest login(LoginRequest loginRequest) {
-		authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+
+		try {
+
+			authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid email or password", e);
+		}
 
 		User user = userRepository.findByEmail(loginRequest.getEmail())
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Email or Password"));
+				.orElseThrow(() -> new IllegalArgumentException("Invalid user after authenticate"));
 
 		// Check if the email is confirmed
 		if (!user.getEmailConfirmed()) {
-			throw new IllegalArgumentException("Email not confirmed. Please confirm your email to log in.");
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+					"Email not confirmed. Please confirm your email to log in.");
 		}
 
 		var jwt = jwtService.generateToken(user);
