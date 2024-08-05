@@ -34,7 +34,7 @@ public class User implements UserDetails {
     private String email;
 
     private String password;
-    private Role role;
+    private Role role=Role.User;
 
 
 	private Boolean emailConfirmed=  false; // Use Boolean to allow null values

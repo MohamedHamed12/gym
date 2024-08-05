@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<?> handleResponseStatusException(ResponseStatusException ex) {
-        System.out.println("*******************exexex***********************"+ex.getStatusCode()+ex.getBody());
+        // System.out.println("*******************exexex***********************"+ex.getStatusCode()+ex.getBody());
         return ResponseEntity.status(ex.getStatusCode())
                              .body(new GeneralResponse(ex.getReason()));
     }
