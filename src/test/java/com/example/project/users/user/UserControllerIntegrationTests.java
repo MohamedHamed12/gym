@@ -303,60 +303,60 @@ public class UserControllerIntegrationTests {
         // mandatory"));
     }
 
-    @Test
-    @DirtiesContext
-
-    public void updateUser_ShouldReturnUpdatedUser_WhenValidRequest() throws Exception {
-
-        UserDTO userDTO = new UserDTO();
-
-        userDTO.setEmail("john.doe2@example.com");
-        userDTO.setFirstname("John2");
-        userDTO.setLastname("Doe2");
-        userDTO.setPassword("password123");
-
-        User user = new User(1, "Jane", "Doe", "jane.doe@example.com", "newpassword",
-                Role.User, true, null);
-       userRepository.save(user);
-        // Mockito.when(userService.updateUser(Mockito.eq(1L),
-        // Mockito.any(UserDTO.class))).thenReturn(user);
-
-        // mockMvc.perform(put(f"/account/users/{user.getid}")
-        mockMvc.perform(put("/account/users/{id}", user.getId())
-
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(userDTO)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-                // .andExpect(jsonPath("$.id").value(1))
-                // .andExpect(jsonPath("$.firstname").value("Jane2"))
-                // .andExpect(jsonPath("$.lastname").value("Doe2"))
-                // .andExpect(jsonPath("$.email").value("jane.doe2@example.com"));
-    }
-
-    // @Test 
+    // @Test
     // @DirtiesContext
 
-    // public void getAllUsers_ShouldReturnListOfUsers() throws Exception {
-    //     User user1 = new User(1, "John", "Doe", "john.doe@example.com", "password123", Role.User, false, null);
-    //     User user2 = new User(2, "Jane", "Doe", "jane.doe@example.com", "password123", Role.Admin, true, null);
-    //     List<User> users = Arrays.asList(user1, user2);
-    //    userRepository.save(user1);
-    //           userRepository.save(user2);
+    // public void updateUser_ShouldReturnUpdatedUser_WhenValidRequest() throws Exception {
 
+    //     UserDTO userDTO = new UserDTO();
 
-    //     // Mockito.when(userService.getAllUsers()).thenReturn(users);
+    //     userDTO.setEmail("john.doe2@example.com");
+    //     userDTO.setFirstname("John2");
+    //     userDTO.setLastname("Doe2");
+    //     userDTO.setPassword("password123");
 
-    //     mockMvc.perform(get("/account/users"))
+    //     User user = new User(1, "Jane", "Doe", "jane.doe@example.com", "newpassword",
+    //             Role.User, true, null);
+    //    userRepository.save(user);
+    //     // Mockito.when(userService.updateUser(Mockito.eq(1L),
+    //     // Mockito.any(UserDTO.class))).thenReturn(user);
+
+    //     // mockMvc.perform(put(f"/account/users/{user.getid}")
+    //     mockMvc.perform(put("/account/users/{id}", user.getId())
+
+    //             .contentType(MediaType.APPLICATION_JSON)
+    //             .content(objectMapper.writeValueAsString(userDTO)))
     //             .andExpect(MockMvcResultMatchers.status().isOk());
-    //             // .andExpect(jsonPath("$[0].id").value(1))
-    //             // .andExpect(jsonPath("$[0].firstname").value("John"))
-    //             // .andExpect(jsonPath("$[0].lastname").value("Doe"))
-    //             // .andExpect(jsonPath("$[0].email").value("john.doe@example.com"))
-    //             // // .andExpect(jsonPath("$[1].id").value(2))
-    //             // .andExpect(jsonPath("$[1].firstname").value("Jane"))
-    //             // .andExpect(jsonPath("$[1].lastname").value("Doe"))
-    //             // .andExpect(jsonPath("$[1].email").value("jane.doe@example.com"));
+    //             // .andExpect(jsonPath("$.id").value(1))
+    //             // .andExpect(jsonPath("$.firstname").value("Jane2"))
+    //             // .andExpect(jsonPath("$.lastname").value("Doe2"))
+    //             // .andExpect(jsonPath("$.email").value("jane.doe2@example.com"));
     // }
+
+    @Test 
+    @DirtiesContext
+
+    public void getAllUsers_ShouldReturnListOfUsers() throws Exception {
+        User user1 = new User(1, "John", "Doe", "john.doe@example.com", "password123", Role.User, false, null);
+        User user2 = new User(2, "Jane", "Doe", "jane.doe@example.com", "password123", Role.Admin, true, null);
+        List<User> users = Arrays.asList(user1, user2);
+       userRepository.save(user1);
+              userRepository.save(user2);
+
+
+        // Mockito.when(userService.getAllUsers()).thenReturn(users);
+
+        mockMvc.perform(get("/account/users"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+                // .andExpect(jsonPath("$[0].id").value(1))
+                // .andExpect(jsonPath("$[0].firstname").value("John"))
+                // .andExpect(jsonPath("$[0].lastname").value("Doe"))
+                // .andExpect(jsonPath("$[0].email").value("john.doe@example.com"))
+                // // .andExpect(jsonPath("$[1].id").value(2))
+                // .andExpect(jsonPath("$[1].firstname").value("Jane"))
+                // .andExpect(jsonPath("$[1].lastname").value("Doe"))
+                // .andExpect(jsonPath("$[1].email").value("jane.doe@example.com"));
+    }
 
     // @Test
     // public void updateUser_ShouldReturnNotFound_WhenUserNotFound() throws
