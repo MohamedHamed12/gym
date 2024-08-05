@@ -41,7 +41,7 @@ public class PasswordController {
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody PasswordResetNewPassword passwordResetRequest) {
         authenticationService.resetPassword(passwordResetRequest);
-        return ResponseEntity.ok("OTP sent to email");
+        return ResponseEntity.ok("Reset Success");
     }
 
 

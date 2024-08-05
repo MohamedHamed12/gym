@@ -113,6 +113,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -190,9 +191,8 @@ public class UserControllerIntegrationTests {
                 .header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andExpect(MockMvcResultMatchers.content().string("User deleted successfully"));
-
-        // verify(userService, times(1)).deleteUser(userId);
+             
+                .andExpect(jsonPath("$.message").value("User deleted successfully"));
     }
 
     @Test
@@ -204,9 +204,9 @@ public class UserControllerIntegrationTests {
         mockMvc.perform(MockMvcRequestBuilders.delete("/account/users/{id}", invalidUserId)
                 .header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.content().string("User not found"));
-
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                // .andExpect(MockMvcResultMatchers.content().string("User not found"));
+                .andExpect(jsonPath("$.message").value("User not found"));
         // verify(userService, times(1)).deleteUser(invalidUserId);
     }
 

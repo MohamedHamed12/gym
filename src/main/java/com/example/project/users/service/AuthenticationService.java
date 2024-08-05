@@ -75,6 +75,10 @@ public class AuthenticationService {
 				userRepository.flush();
 
 			}
+			else{
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+					"Email is already used before");
+			}
 		}
 
 		User user = new User();

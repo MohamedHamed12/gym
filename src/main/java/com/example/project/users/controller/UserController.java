@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.project.users.dto.GeneralResponse;
 import com.example.project.users.service.UserService;
 
 
@@ -30,22 +31,18 @@ public class UserController {
 
     // @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        try {
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+     
             userService.deleteUser(id);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User deleted successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new GeneralResponse("User deleted successfully"));
+     
     }
 
     @DeleteMapping("/users")
     public ResponseEntity<String> deleteAllUsers() {
-        try {
+        
             userService.deleteAllUsers();
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("All users deleted successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting users");
-        }
+       
     }
 }
