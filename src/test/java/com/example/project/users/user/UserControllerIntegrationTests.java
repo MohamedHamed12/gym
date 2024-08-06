@@ -126,6 +126,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.test.web.servlet.MvcResult;
+
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -346,8 +348,20 @@ public class UserControllerIntegrationTests {
 
         // Mockito.when(userService.getAllUsers()).thenReturn(users);
 
-        mockMvc.perform(get("/account/users"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        MvcResult result=mockMvc.perform(get("/account/users"))
+                .andExpect(MockMvcResultMatchers.status().isOk())  
+                  .andReturn();
+
+        String content = result.getResponse().getContentAsString();
+        System.out.println("Response Content: " + content);
+
+
+         result=mockMvc.perform(get("/account/users?page=0&size=10"))
+                .andExpect(MockMvcResultMatchers.status().isOk())  
+                  .andReturn();
+            
+         content = result.getResponse().getContentAsString();
+        System.out.println("Response Content: " + content);
                 // .andExpect(jsonPath("$[0].id").value(1))
                 // .andExpect(jsonPath("$[0].firstname").value("John"))
                 // .andExpect(jsonPath("$[0].lastname").value("Doe"))

@@ -17,6 +17,8 @@ import com.example.project.users.entity.User;
 import com.example.project.users.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class UserService {
@@ -71,15 +73,17 @@ public class UserService {
             user.setEmailConfirmed(userDTO.getEmailConfirmed());
             return userRepository.save(user);
         } else {
-                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "User not found");
         }
     }
 
+    // public List<User> getAllUsers() {
+    // return userRepository.findAll();
+    // }
 
-
-      public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public Page<User> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     // @Transactional

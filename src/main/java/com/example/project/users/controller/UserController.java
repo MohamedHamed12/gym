@@ -22,7 +22,8 @@ import com.example.project.users.entity.User;
 import com.example.project.users.service.UserService;
 
 import jakarta.validation.Valid;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 
 @RestController
@@ -74,9 +75,15 @@ public class UserController {
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
-       @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getAllUsers();
-        return new ResponseEntity<>(users, HttpStatus.OK);
-    }
+    //    @GetMapping("/users")
+    // public ResponseEntity<List<User>> getAllUsers() {
+    //     List<User> users = userService.getAllUsers();
+    //     return new ResponseEntity<>(users, HttpStatus.OK);
+    // }
+
+    @GetMapping("/users")
+public ResponseEntity<Page<User>> getAllUsers(Pageable pageable) {
+    Page<User> users = userService.getAllUsers(pageable);
+    return new ResponseEntity<>(users, HttpStatus.OK);
+}
 }
