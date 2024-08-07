@@ -128,15 +128,7 @@ public class OtpService {
             otpRepository.save(otp);
             userRepository.save(user); // Save the user to update the
 
-            // user = userRepository.findByEmail(email)
-            // .orElseThrow(() -> {
-            // logger.error("User not found for email: {}", email);
-            // return new IllegalArgumentException("User not found");
-            // });
-            // System.out.println("***************user*********************************");
-            // System.out.println(user);
-            // user.set
-            // userRepository.save(user);
+       
 
             logger.info("Generated OTP {} for user {}", otpCode, email);
             try {

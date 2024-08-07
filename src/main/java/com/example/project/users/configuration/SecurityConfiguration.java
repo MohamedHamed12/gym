@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -21,6 +22,7 @@ import com.example.project.users.service.UserService;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfiguration {
 
 	@Autowired
@@ -53,26 +55,10 @@ public class SecurityConfiguration {
 				.authorizeHttpRequests(
 						authz -> authz
 								.anyRequest().permitAll()
-				// .requestMatchers("/swagger-ui/**", "/v3/api-docs/**",
-				// "/swagger-ui.html").permitAll()
-				// .requestMatchers("/public**").permitAll() // Allow access to any endpoint
-				// ending with "public"
-
-				// Your other security rules...
-				// .anyRequest().authenticated()
+	
 				)
 
-				// request->request.requestMatchers("/account/**").permitAll()
-				// .requestMatchers("/products/**").permitAll()
-				// .requestMatchers("/otp/**").permitAll()
-				// .requestMatchers("/api-docs/**").permitAll()
-				// .requestMatchers("/swagger-ui.html/**").permitAll()
-				// .requestMatchers("/swagger-ui/**", "/v3/api-docs/**",
-				// "/swagger-ui.html").permitAll()
-
-				// .requestMatchers("/admin/**").hasAuthority(Role.Admin.name())
-				// .requestMatchers("/user/**").hasAuthority(Role.User.name())
-				// .anyRequest().authenticated())
+	
 				.sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider())
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

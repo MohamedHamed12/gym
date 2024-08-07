@@ -1,10 +1,12 @@
 package com.example.project.users.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,9 +36,19 @@ public class UserService {
 
             @Override
             public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-                return userRepository.findByEmail(username)
-                        .orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
+                // return userRepository.findByEmail(username)
+                // .orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
+
+                User user = userRepository.findByEmail(username)
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+                return new org.springframework.security.core.userdetails.User(
+                        user.getUsername(),
+                        user.getPassword(),
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())));
+
             }
+
         };
 
     }
@@ -81,37 +93,10 @@ public class UserService {
         }
     }
 
-    // public List<User> getAllUsers() {
-    // return userRepository.findAll();
-    // }
-
-    // public Page<User> getAllUsers(Pageable pageable) {
-    //     return userRepository.findAll(pageable);
-    // }
-
-
-
     public Page<User> findAllUsers(UserFilterDTO filterDTO, Pageable pageable) {
         final Specification<User> specification = UserSpecification.filterUser(filterDTO);
         return userRepository.findAll(specification, pageable);
     }
-
-
-
-
-
-
-    
-    // @Transactional
-    // public void deleteUser(Long userId) {
-    // Optional<User> userOptional = userRepository.findById(userId);
-    // if (userOptional.isPresent()) {
-    // userRepository.delete(userOptional.get());
-    // } else {
-    // ErrorResponse errorResponse =new ErrorResponse("User not found");
-    // return errorResponse;
-    // }
-    // }
 
     @Transactional
     public void deleteAllUsers() {

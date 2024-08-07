@@ -58,6 +58,8 @@ public class UserController {
     // #id)")
 
     @DeleteMapping("/users/{id}")
+    @PreAuthorize("hasRole('ROLE_User')")
+
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
 
         userService.deleteUser(id);
@@ -89,70 +91,11 @@ public class UserController {
 
 
     @GetMapping("/users")
+
     public ResponseEntity<Page<User>> getUsers(
             UserFilterDTO filterDTO,
             Pageable pageable) {
         return ResponseEntity.ok(userService.findAllUsers(filterDTO, pageable));
     }
-    // public Page<User> getAllUsers(
-    //     @And({
-    //         @Spec(path = "firstname", params = "firstnameContains", spec = Like.class),
-    //         @Spec(path = "firstname", params = "firstnameStartsWith", spec = StartingWith.class),
-    //         @Spec(path = "firstname", params = "firstnameExact", spec = Equal.class),
-    //         @Spec(path = "lastname", params = "lastnameContains", spec = Like.class),
-    //         @Spec(path = "lastname", params = "lastnameStartsWith", spec = StartingWith.class),
-    //         @Spec(path = "lastname", params = "lastnameExact", spec = Equal.class),
-    //         // @Spec(path = "email", params = "email", spec = Like.class),
-    //         // @Spec(path = "id", params = "id", spec = Equal.class),
-    //         // @Spec(path = "id", params = "idGreaterThan", spec = GreaterThan.class),
-    //         // @Spec(path = "id", params = "idLessThan", spec = LessThan.class)
-    //     }) Specification<User> spec,
-    //     Pageable pageable) {
-    //     return userRepository.findAll(spec, pageable);
-    // }
-    // @GetMapping("/users")
-    // public ResponseEntity<List<User>> getAllUsers() {
-    // List<User> users = userService.getAllUsers();
-    // return new ResponseEntity<>(users, HttpStatus.OK);
-    // }
-
-    // @GetMapping("/users")
-    // public ResponseEntity<Page<User>> getAllUsers(
-    // @RequestParam(required = false) String firstname_contains,
-    // @RequestParam(required = false) String firstname_startsWith,
-    // @RequestParam(required = false) String firstname_equals,
-
-    // Pageable pageable) {
-    // Page<User> users = userService.getAllUsers(pageable);
-    // return new ResponseEntity<>(users, HttpStatus.OK);
-    // }
-
-
-    // @GetMapping(value = "/users")
-    // public Page<User> getAllUsers(
-    //         @RequestParam(required = false) String firstname,
-    //         @RequestParam(required = false) String role,
-    //         Pageable pageable) {
-    //     Specification<User> spec = Specification.where(null);
-    //     if (firstname != null) {
-    //         spec = spec.and(UserSpecifications.hasFirstname(firstname));
-    //     }
-    //     if (role != null) {
-    //         spec = spec.and(UserSpecifications.hasRole(role));
-    //     }
-    //     return userRepository.findAll(spec, pageable);
-    // }
-
-
-
-
-    // @GetMapping(value = "/users")
-    // Page<?> search(@Filter Specification<User> spec, Pageable page) {
-    // return userRepository(spec, page);
-    // }
-    // @GetMapping(value = "/users")
-    // public Page<User> search(Specification<User> spec, Pageable pageable) {
-    // return userRepository.findAll(spec, pageable);
-    // }
-
+   
 }
