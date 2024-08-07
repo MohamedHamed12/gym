@@ -128,7 +128,6 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.test.web.servlet.MvcResult;
 
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -308,68 +307,77 @@ public class UserControllerIntegrationTests {
     // @Test
     // @DirtiesContext
 
-    // public void updateUser_ShouldReturnUpdatedUser_WhenValidRequest() throws Exception {
+    // public void updateUser_ShouldReturnUpdatedUser_WhenValidRequest() throws
+    // Exception {
 
-    //     UserDTO userDTO = new UserDTO();
+    // UserDTO userDTO = new UserDTO();
 
-    //     userDTO.setEmail("john.doe2@example.com");
-    //     userDTO.setFirstname("John2");
-    //     userDTO.setLastname("Doe2");
-    //     userDTO.setPassword("password123");
+    // userDTO.setEmail("john.doe2@example.com");
+    // userDTO.setFirstname("John2");
+    // userDTO.setLastname("Doe2");
+    // userDTO.setPassword("password123");
 
-    //     User user = new User(1, "Jane", "Doe", "jane.doe@example.com", "newpassword",
-    //             Role.User, true, null);
-    //    userRepository.save(user);
-    //     // Mockito.when(userService.updateUser(Mockito.eq(1L),
-    //     // Mockito.any(UserDTO.class))).thenReturn(user);
+    // User user = new User(1, "Jane", "Doe", "jane.doe@example.com", "newpassword",
+    // Role.User, true, null);
+    // userRepository.save(user);
+    // // Mockito.when(userService.updateUser(Mockito.eq(1L),
+    // // Mockito.any(UserDTO.class))).thenReturn(user);
 
-    //     // mockMvc.perform(put(f"/account/users/{user.getid}")
-    //     mockMvc.perform(put("/account/users/{id}", user.getId())
+    // // mockMvc.perform(put(f"/account/users/{user.getid}")
+    // mockMvc.perform(put("/account/users/{id}", user.getId())
 
-    //             .contentType(MediaType.APPLICATION_JSON)
-    //             .content(objectMapper.writeValueAsString(userDTO)))
-    //             .andExpect(MockMvcResultMatchers.status().isOk());
-    //             // .andExpect(jsonPath("$.id").value(1))
-    //             // .andExpect(jsonPath("$.firstname").value("Jane2"))
-    //             // .andExpect(jsonPath("$.lastname").value("Doe2"))
-    //             // .andExpect(jsonPath("$.email").value("jane.doe2@example.com"));
+    // .contentType(MediaType.APPLICATION_JSON)
+    // .content(objectMapper.writeValueAsString(userDTO)))
+    // .andExpect(MockMvcResultMatchers.status().isOk());
+    // // .andExpect(jsonPath("$.id").value(1))
+    // // .andExpect(jsonPath("$.firstname").value("Jane2"))
+    // // .andExpect(jsonPath("$.lastname").value("Doe2"))
+    // // .andExpect(jsonPath("$.email").value("jane.doe2@example.com"));
     // }
 
-    @Test 
+    @Test
     @DirtiesContext
 
     public void getAllUsers_ShouldReturnListOfUsers() throws Exception {
         User user1 = new User(1, "John", "Doe", "john.doe@example.com", "password123", Role.User, false, null);
         User user2 = new User(2, "Jane", "Doe", "jane.doe@example.com", "password123", Role.Admin, true, null);
         List<User> users = Arrays.asList(user1, user2);
-       userRepository.save(user1);
-              userRepository.save(user2);
-
+        userRepository.save(user1);
+        userRepository.save(user2);
 
         // Mockito.when(userService.getAllUsers()).thenReturn(users);
-
-        MvcResult result=mockMvc.perform(get("/account/users"))
-                .andExpect(MockMvcResultMatchers.status().isOk())  
-                  .andReturn();
+        // System.out.println("************************************");
+        MvcResult result = mockMvc.perform(get("/account/users"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn();
 
         String content = result.getResponse().getContentAsString();
-        System.out.println("Response Content: " + content);
+        // System.out.println("Response Content: " + content);
 
+        // result=mockMvc.perform(get("/account/users?page=0&size=10"))
+        // .andExpect(MockMvcResultMatchers.status().isOk())
+        // .andReturn();
 
-         result=mockMvc.perform(get("/account/users?page=0&size=10"))
-                .andExpect(MockMvcResultMatchers.status().isOk())  
-                  .andReturn();
-            
-         content = result.getResponse().getContentAsString();
-        System.out.println("Response Content: " + content);
-                // .andExpect(jsonPath("$[0].id").value(1))
-                // .andExpect(jsonPath("$[0].firstname").value("John"))
-                // .andExpect(jsonPath("$[0].lastname").value("Doe"))
-                // .andExpect(jsonPath("$[0].email").value("john.doe@example.com"))
-                // // .andExpect(jsonPath("$[1].id").value(2))
-                // .andExpect(jsonPath("$[1].firstname").value("Jane"))
-                // .andExpect(jsonPath("$[1].lastname").value("Doe"))
-                // .andExpect(jsonPath("$[1].email").value("jane.doe@example.com"));
+        // content = result.getResponse().getContentAsString();
+        // System.out.println("Response Content: " + content);
+
+        result = mockMvc.perform(get("/account/users?firstnameStartsWith=John"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.totalElements").value(1))
+
+                .andReturn();
+
+        // content = result.getResponse().getContentAsString();
+        // System.out.println("Response Content: " + content);
+
+        // .andExpect(jsonPath("$[0].id").value(1))
+        // .andExpect(jsonPath("$[0].firstname").value("John"))
+        // .andExpect(jsonPath("$[0].lastname").value("Doe"))
+        // .andExpect(jsonPath("$[0].email").value("john.doe@example.com"))
+        // // .andExpect(jsonPath("$[1].id").value(2))
+        // .andExpect(jsonPath("$[1].firstname").value("Jane"))
+        // .andExpect(jsonPath("$[1].lastname").value("Doe"))
+        // .andExpect(jsonPath("$[1].email").value("jane.doe@example.com"));
     }
 
     // @Test

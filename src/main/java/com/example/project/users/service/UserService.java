@@ -13,12 +13,15 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.project.users.dto.GeneralResponse;
 import com.example.project.users.dto.UserDTO;
+import com.example.project.users.dto.UserFilterDTO;
 import com.example.project.users.entity.User;
 import com.example.project.users.repository.UserRepository;
+import com.example.project.users.specs.UserSpecification;
 
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 @Service
 public class UserService {
@@ -82,10 +85,23 @@ public class UserService {
     // return userRepository.findAll();
     // }
 
-    public Page<User> getAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable);
+    // public Page<User> getAllUsers(Pageable pageable) {
+    //     return userRepository.findAll(pageable);
+    // }
+
+
+
+    public Page<User> findAllUsers(UserFilterDTO filterDTO, Pageable pageable) {
+        final Specification<User> specification = UserSpecification.filterUser(filterDTO);
+        return userRepository.findAll(specification, pageable);
     }
 
+
+
+
+
+
+    
     // @Transactional
     // public void deleteUser(Long userId) {
     // Optional<User> userOptional = userRepository.findById(userId);

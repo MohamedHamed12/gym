@@ -37,7 +37,7 @@ public class User implements UserDetails {
     private Role role=Role.User;
 
 
-	private Boolean emailConfirmed=  false; // Use Boolean to allow null values
+	private Boolean emailConfirmed=  false;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
