@@ -67,15 +67,17 @@ public class UserController {
 
     }
 
-    @DeleteMapping("/users")
-    public ResponseEntity<String> deleteAllUsers() {
+    // @DeleteMapping("/users")
+    // public ResponseEntity<String> deleteAllUsers() {
 
-        userService.deleteAllUsers();
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("All users deleted successfully");
+    //     userService.deleteAllUsers();
+    //     return ResponseEntity.status(HttpStatus.NO_CONTENT).body("All users deleted successfully");
 
-    }
+    // }
 
     @PostMapping("/users")
+    @PreAuthorize("hasRole('ROLE_User')")
+
     public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO userDTO) {
 
         User user = userService.saveUser(userDTO);
@@ -83,6 +85,7 @@ public class UserController {
     }
 
     @PutMapping("users/{id}")
+    @PreAuthorize("hasRole('ROLE_User')")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
         User updatedUser = userService.updateUser(id, userDTO);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
@@ -91,7 +94,7 @@ public class UserController {
 
 
     @GetMapping("/users")
-
+    @PreAuthorize("hasRole('ROLE_User')")
     public ResponseEntity<Page<User>> getUsers(
             UserFilterDTO filterDTO,
             Pageable pageable) {
